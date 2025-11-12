@@ -29,6 +29,21 @@ async function run() {
 
     const db = client.db("nuvia_db");
     const productsCollection = db.collection("products");
+    const usersCollection = db.collection("users");
+
+    app.post("/users", async (req, res) => {
+      const newUser = req.body;
+
+      const email = req.body.email;
+      const query = { email: email };
+      const existingUser = await usersCollection.findOne(query);
+      if (existingUser) {
+        res.send({ message: "user already exits. Do not need to add" });
+      } else {
+        const result = await usersCollection.insertOne(newUser);
+        res.send(result);
+      }
+    });
 
     app.get("/products", async (req, res) => {
       const cursor = productsCollection.find();
@@ -36,9 +51,18 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/latest-artworks", async (req, res) => {
+      const cursor = productsCollection
+        .find()
+        .sort({ created_at: -1 })
+        .limit(6);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new Object(id) };
+      const query = { _id: new ObjectId(id) };
       const result = await productsCollection.findOne(query);
       res.send(result);
     });
@@ -75,7 +99,7 @@ async function run() {
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
   } finally {
-    //     await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
