@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 // const admin = require("firebase-admin");
@@ -9,8 +10,7 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-const uri =
-  "mongodb+srv://nuviaDBUsers:xHIQFhPU2jzJAjfv@newproject10.iqzban8.mongodb.net/?appName=Newproject10";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@newproject10.iqzban8.mongodb.net/?appName=Newproject10`;
 
 const client = new MongoClient(uri, {
   serverApi: {
