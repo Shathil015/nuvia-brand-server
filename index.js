@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
+// const admin = require("firebase-admin");
 const port = process.env.PORT || 3000;
 
 //middle wire
@@ -29,11 +30,11 @@ async function run() {
 
     const db = client.db("nuvia_db");
     const productsCollection = db.collection("products");
+    const galleryCollection = db.collection("gallery");
     const usersCollection = db.collection("users");
 
     app.post("/users", async (req, res) => {
       const newUser = req.body;
-
       const email = req.body.email;
       const query = { email: email };
       const existingUser = await usersCollection.findOne(query);
@@ -91,6 +92,49 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await productsCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.post("/gallery", async (req, res) => {
+      const newAdd = req.body;
+      const result = await galleryCollection.insertOne(newAdd);
+      res.send(result);
+    });
+
+    app.get("/gallery", async (req, res) => {
+      const email = req.query.email;
+      const query = {};
+      if (email) {
+        query.add_email = email;
+      }
+      const cursor = galleryCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/products/gallery/:productId", async (req, res) => {
+      const productId = req.params.productId;
+      const query = { product: productId };
+      const cursor = galleryCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/gallery", async (req, res) => {
+      const query = {};
+      if (query.email) {
+        query.adder_email = email;
+      }
+
+      const cursor = galleryCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.delete("/gallery/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await galleryCollection.deleteOne(query);
       res.send(result);
     });
 
