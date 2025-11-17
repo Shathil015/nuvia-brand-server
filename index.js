@@ -30,6 +30,7 @@ async function run() {
 
     const db = client.db("nuvia_db");
     const productsCollection = db.collection("products");
+    // const userDB = client.db("userDB");
     const galleryCollection = db.collection("gallery");
     const usersCollection = db.collection("users");
 
@@ -44,6 +45,12 @@ async function run() {
         const result = await usersCollection.insertOne(newUser);
         res.send(result);
       }
+    });
+
+    app.post("/users", async (req, res) => {
+      const newUser = req.body;
+      const result = await usersCollection.insertOne(newUser);
+      res.send(result);
     });
 
     app.get("/products", async (req, res) => {
@@ -138,7 +145,7 @@ async function run() {
       res.send(result);
     });
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
